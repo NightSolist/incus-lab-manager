@@ -1,7 +1,7 @@
 // Auto-generated. Do not edit.
 
 use serde::{Serialize, Deserialize};
-use std::collections::HashMap;
+use crate::incus::ConfigMap;
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct InstanceSource {
     #[serde(rename = "type")]    pub r#type: String,
@@ -12,7 +12,7 @@ pub struct InstanceSource {
 
     #[serde(skip_serializing_if = "Option::is_none")]    pub fingerprint: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]    pub properties: Option<HashMap<String, String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]    pub properties: Option<ConfigMap>,
 
     #[serde(skip_serializing_if = "Option::is_none")]    pub server: Option<String>,
 
@@ -26,7 +26,7 @@ pub struct InstanceSource {
 
     #[serde(skip_serializing_if = "Option::is_none")]    pub operation: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]    pub websockets: Option<HashMap<String, String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]    pub websockets: Option<ConfigMap>,
 
     #[serde(skip_serializing_if = "Option::is_none")]    pub source: Option<String>,
 

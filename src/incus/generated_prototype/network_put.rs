@@ -3,6 +3,6 @@ use crate::incus::ConfigMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NetworkPut {
-    pub config: ConfigMap,
-    pub description: String,
+    config: ConfigMap,
+    description: String,
 }
