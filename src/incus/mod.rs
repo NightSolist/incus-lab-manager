@@ -1,6 +1,7 @@
 pub mod custom;
-pub mod generated;
 
-// Переэкспортируем всё наружу, чтобы клиент мог импортировать типы напрямую
-pub use custom::*;
-pub use generated::*;
+#[allow(unused_imports, dead_code)]
+pub mod generated_prototype;
+
+pub use custom::{ConfigMap, DevicesMap};
+pub use generated_prototype::*;
