@@ -19,3 +19,6 @@ certs/
 
 # MacOS / OS-specific
 .DS_Store
+Makefile
+README.md
+Plan_of_realisation.md
