@@ -1,9 +1,7 @@
 // Auto-generated. Do not edit.
 
 use serde::{Serialize, Deserialize};
-use crate::incus::ConfigMap;
-use crate::incus::DevicesMap;
-use crate::incus::InstanceSource;
+use crate::incus::ConfigMap;use crate::incus::DevicesMap;use crate::incus::InstanceSource;
 use crate::incus::InstanceType;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]

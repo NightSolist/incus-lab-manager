@@ -1,9 +1,7 @@
 // Auto-generated. Do not edit.
 
 use serde::{Serialize, Deserialize};
-use crate::incus::ConfigMap;
-use crate::incus::DevicesMap;
-
+use crate::incus::ConfigMap;use crate::incus::DevicesMap;
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Profile {
     pub name: String,
