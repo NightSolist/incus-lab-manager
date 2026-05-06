@@ -1,0 +1,21 @@
+# Rust
+target/
+Cargo.lock
+
+# Certificates and Secrets
+certs/
+*.key
+*.crt
+*.pem
+*.p12
+*.pfx
+
+# VS Code / Editor
+.vscode/
+*.code-workspace
+
+# Environment
+.env
+
+# MacOS / OS-specific
+.DS_Store
