@@ -32,9 +32,9 @@ steps:
     settings:
       dsn:
         from_secret: email_dsn
-      from:
+      from.address:
         from_secret: email_username
-      from_name: Incus Sync Bot
+      from.name: Incus Sync Bot
       recipients:
         from_secret: email_recipient
       recipients_only: true
@@ -71,9 +71,9 @@ steps:
     settings:
       dsn:
         from_secret: email_dsn
-      from:
+      from.address:
         from_secret: email_username
-      from_name: Incus Sync Bot
+      from.name: Incus Sync Bot
       recipients:
         from_secret: email_recipient
       recipients_only: true
