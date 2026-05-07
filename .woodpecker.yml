@@ -11,7 +11,7 @@ when:
 steps:
 
   - name: cargo-check
-    image: rust:1.81
+    image: rust:latest
     commands:
       - rustc --version
       - cargo --version
@@ -20,7 +20,7 @@ steps:
       - echo "✓ cargo check passed"
 
   - name: cargo-fmt
-    image: rust:1.81
+    image: rust:latest
     commands:
       - rustup component add rustfmt
       - echo "▶ Проверка форматирования сгенерированного кода..."
