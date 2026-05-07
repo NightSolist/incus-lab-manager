@@ -1,9 +1,3 @@
-# Self-hosted Woodpecker CI/CD pipeline для автоматически
-# сгенерированных Rust DTO-моделей Incus.
-#
-# Запускается при push или вручную через REST API.
-# Выполняет независимую compile-time валидацию и нотификацию.
-
 when:
   - event: push
   - event: manual
@@ -29,18 +23,19 @@ steps:
 
   - name: notify-engineer
     image: deblan/woodpecker-email
-    environment:
-      PLUGIN_DSN:
+    settings:
+      dsn:
         from_secret: email_dsn
-      PLUGIN_FROM_ADDRESS:
-        from_secret: email_username
-      PLUGIN_FROM_NAME: Incus Sync Bot
-      PLUGIN_RECIPIENTS:
+      from:
+        address:
+          from_secret: email_username
+        name: Incus Sync Bot
+      recipients:
         from_secret: email_recipient
-      PLUGIN_RECIPIENTS_ONLY: "true"
-      PLUGIN_CONTENT_TYPE: text/plain
-      PLUGIN_SUBJECT: "Incus Sync CI: ветка ${CI_COMMIT_BRANCH} прошла проверку"
-      PLUGIN_BODY: |
+      recipients_only: true
+      content_type: text/plain
+      subject: "Incus Sync CI: ветка ${CI_COMMIT_BRANCH} прошла проверку"
+      body: |
         Здравствуйте!
 
         Self-hosted Woodpecker CI/CD завершил проверку
@@ -67,18 +62,19 @@ steps:
 
   - name: notify-failure
     image: deblan/woodpecker-email
-    environment:
-      PLUGIN_DSN:
+    settings:
+      dsn:
         from_secret: email_dsn
-      PLUGIN_FROM_ADDRESS:
-        from_secret: email_username
-      PLUGIN_FROM_NAME: Incus Sync Bot
-      PLUGIN_RECIPIENTS:
+      from:
+        address:
+          from_secret: email_username
+        name: Incus Sync Bot
+      recipients:
         from_secret: email_recipient
-      PLUGIN_RECIPIENTS_ONLY: "true"
-      PLUGIN_CONTENT_TYPE: text/plain
-      PLUGIN_SUBJECT: "Incus Sync CI: ветка ${CI_COMMIT_BRANCH} требует внимания"
-      PLUGIN_BODY: |
+      recipients_only: true
+      content_type: text/plain
+      subject: "⚠ Incus Sync CI: ветка ${CI_COMMIT_BRANCH} требует внимания"
+      body: |
         Здравствуйте!
 
         Self-hosted Woodpecker CI/CD обнаружил проблемы в
