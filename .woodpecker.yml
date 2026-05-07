@@ -11,7 +11,7 @@ when:
 steps:
 
   - name: cargo-check
-    image: rust:latest
+    image: rust:1.83
     commands:
       - rustc --version
       - cargo --version
@@ -20,7 +20,7 @@ steps:
       - echo "✓ cargo check passed"
 
   - name: cargo-fmt
-    image: rust:latest
+    image: rust:1.83
     commands:
       - rustup component add rustfmt
       - echo "▶ Проверка форматирования сгенерированного кода..."
@@ -32,9 +32,9 @@ steps:
     settings:
       dsn:
         from_secret: email_dsn
-      from.address:
+      from:
         from_secret: email_username
-      from.name: Incus Sync Bot
+      from_name: Incus Sync Bot
       recipients:
         from_secret: email_recipient
       recipients_only: true
@@ -71,9 +71,9 @@ steps:
     settings:
       dsn:
         from_secret: email_dsn
-      from.address:
+      from:
         from_secret: email_username
-      from.name: Incus Sync Bot
+      from_name: Incus Sync Bot
       recipients:
         from_secret: email_recipient
       recipients_only: true
