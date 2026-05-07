@@ -30,17 +30,11 @@ steps:
   - name: notify-engineer
     image: deblan/woodpecker-email
     settings:
+      dsn:
+        from_secret: email_dsn
       from.address:
         from_secret: email_username
       from.name: Incus Sync Bot
-      host:
-        from_secret: email_host
-      port:
-        from_secret: email_port
-      username:
-        from_secret: email_username
-      password:
-        from_secret: email_password
       recipients:
         from_secret: email_recipient
       recipients_only: true
@@ -75,17 +69,11 @@ steps:
   - name: notify-failure
     image: deblan/woodpecker-email
     settings:
+      dsn:
+        from_secret: email_dsn
       from.address:
         from_secret: email_username
       from.name: Incus Sync Bot
-      host:
-        from_secret: email_host
-      port:
-        from_secret: email_port
-      username:
-        from_secret: email_username
-      password:
-        from_secret: email_password
       recipients:
         from_secret: email_recipient
       recipients_only: true
