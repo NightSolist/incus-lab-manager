@@ -5,4 +5,6 @@ use crate::incus::ConfigMap;
 pub struct NetworkPut {
     pub config: ConfigMap,
     pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub priority: Option<i64>,
 }

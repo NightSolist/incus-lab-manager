@@ -4,13 +4,13 @@ use crate::incus::DevicesMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct InstancePut {
-    architecture: String,
-    config: ConfigMap,
-    devices: DevicesMap,
-    ephemeral: bool,
-    profiles: Vec<String>,
-    restore: Option<String>,
-    disk_only: Option<bool>,
-    stateful: Option<bool>,
-    description: String,
+    pub architecture: String,
+    pub config: ConfigMap,
+    pub devices: DevicesMap,
+    pub ephemeral: bool,
+    pub profiles: Vec<String>,
+    pub restore: Option<String>,
+    pub disk_only: Option<bool>,
+    pub stateful: Option<bool>,
+    pub description: String,
 }
