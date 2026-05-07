@@ -29,19 +29,18 @@ steps:
 
   - name: notify-engineer
     image: deblan/woodpecker-email
-    settings:
-      dsn:
+    environment:
+      PLUGIN_DSN:
         from_secret: email_dsn
-      from.address:
+      PLUGIN_FROM_ADDRESS:
         from_secret: email_username
-      from.name: Incus Sync Bot
-      recipients:
+      PLUGIN_FROM_NAME: Incus Sync Bot
+      PLUGIN_RECIPIENTS:
         from_secret: email_recipient
-      recipients_only: true
-      content_type: text/plain
-      subject: >
-        Incus Sync CI: ветка ${CI_COMMIT_BRANCH} прошла проверку
-      body: |
+      PLUGIN_RECIPIENTS_ONLY: "true"
+      PLUGIN_CONTENT_TYPE: text/plain
+      PLUGIN_SUBJECT: "Incus Sync CI: ветка ${CI_COMMIT_BRANCH} прошла проверку"
+      PLUGIN_BODY: |
         Здравствуйте!
 
         Self-hosted Woodpecker CI/CD завершил проверку
@@ -68,19 +67,18 @@ steps:
 
   - name: notify-failure
     image: deblan/woodpecker-email
-    settings:
-      dsn:
+    environment:
+      PLUGIN_DSN:
         from_secret: email_dsn
-      from.address:
+      PLUGIN_FROM_ADDRESS:
         from_secret: email_username
-      from.name: Incus Sync Bot
-      recipients:
+      PLUGIN_FROM_NAME: Incus Sync Bot
+      PLUGIN_RECIPIENTS:
         from_secret: email_recipient
-      recipients_only: true
-      content_type: text/plain
-      subject: >
-        ⚠ Incus Sync CI: ветка ${CI_COMMIT_BRANCH} требует внимания
-      body: |
+      PLUGIN_RECIPIENTS_ONLY: "true"
+      PLUGIN_CONTENT_TYPE: text/plain
+      PLUGIN_SUBJECT: "Incus Sync CI: ветка ${CI_COMMIT_BRANCH} требует внимания"
+      PLUGIN_BODY: |
         Здравствуйте!
 
         Self-hosted Woodpecker CI/CD обнаружил проблемы в
