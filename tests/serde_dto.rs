@@ -5,8 +5,8 @@
 //!     cargo test --test serde_dto
 
 use incus_lab_manager::incus::{
-    InstanceSource, InstancesPost, NetworkPut, NetworksPost, ProfilePut,
-    ProfilesPost, StoragePoolPut, StoragePoolsPost,
+    InstanceSource, InstancesPost, NetworkPut, NetworksPost, ProfilePut, ProfilesPost,
+    StoragePoolPut, StoragePoolsPost,
 };
 use std::collections::HashMap;
 

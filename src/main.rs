@@ -6,8 +6,8 @@ mod remotes;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use std::path::Path;
 use std::fs;
+use std::path::Path;
 
 #[derive(Parser)]
 #[command(name = "incus-lab")]
@@ -30,17 +30,11 @@ enum Commands {
         file: String,
     },
     /// Start a specific instance
-    Start {
-        name: String,
-    },
+    Start { name: String },
     /// Stop a specific instance (force)
-    Stop {
-        name: String,
-    },
+    Stop { name: String },
     /// Delete a specific instance
-    Delete {
-        name: String,
-    },
+    Delete { name: String },
     /// List instances (debug)
     Info,
 }

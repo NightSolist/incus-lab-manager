@@ -1,24 +1,16 @@
-# Rust
+# Rust build artifacts
 target/
-Cargo.lock
 
-# Certificates and Secrets
-certs/
-*.key
-*.crt
-*.pem
-*.p12
-*.pfx
-
-# VS Code / Editor
-.vscode/
-*.code-workspace
-
-# Environment
+# Certificates and secrets
+certs/*.key
+certs/*.crt
+certs/*.pem
+certs/*.p12
+certs/*.pfx
 .env
 
-# MacOS / OS-specific
+# IDE
+.vscode/
+*.code-workspace
+.idea/
 .DS_Store
-Makefile
-README.md
-Plan_of_realisation.md

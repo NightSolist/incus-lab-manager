@@ -2,14 +2,11 @@ use anyhow::Result;
 use std::collections::HashMap;
 
 use crate::client::IncusClient;
-use crate::config::{
-    InstanceConfig, Lab, NetworkConfig, ProfileConfig, StoragePoolConfig,
-};
+use crate::config::{InstanceConfig, Lab, NetworkConfig, ProfileConfig, StoragePoolConfig};
 use crate::remotes;
 
 use crate::incus::{
-    InstanceSource, InstanceType, InstancesPost, NetworksPost,
-    ProfilesPost, StoragePoolsPost,
+    InstanceSource, InstanceType, InstancesPost, NetworksPost, ProfilesPost, StoragePoolsPost,
 };
 
 pub struct Deployer<'a> {
@@ -92,10 +89,7 @@ impl<'a> Deployer<'a> {
             name: config.name.clone(),
             driver: config.driver.clone(),
             config: pool_config,
-            description: config
-                .description
-                .clone()
-                .unwrap_or_else(|| String::new()),
+            description: config.description.clone().unwrap_or_else(|| String::new()),
         };
 
         self.client.create_storage_pool(&req).await?;
@@ -170,10 +164,7 @@ impl<'a> Deployer<'a> {
         let req = ProfilesPost {
             name: config.name.clone(),
             config: config.config.clone().into_iter().collect(),
-            description: config
-                .description
-                .clone()
-                .unwrap_or_else(|| String::new()),
+            description: config.description.clone().unwrap_or_else(|| String::new()),
             devices,
         };
 

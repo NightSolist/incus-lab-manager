@@ -1,12 +1,12 @@
-use anyhow::{Context, Result, bail};
+use anyhow::{bail, Context, Result};
 use reqwest::{Client, Identity};
 use serde_json::Value;
 use std::fs;
 use std::path::Path;
 
 use crate::incus::{
-    InstancesPost, InstanceStatePut, NetworksPost,
-    ProfilesPost, ProfilePut, StoragePoolsPost, StoragePoolPut,
+    InstanceStatePut, InstancesPost, NetworksPost, ProfilePut, ProfilesPost, StoragePoolPut,
+    StoragePoolsPost,
 };
 
 #[derive(Clone)]
@@ -31,7 +31,10 @@ impl IncusClient {
             .danger_accept_invalid_certs(true)
             .build()?;
 
-        Ok(Self { http: client, base_url: base_url.to_string() })
+        Ok(Self {
+            http: client,
+            base_url: base_url.to_string(),
+        })
     }
 
     pub async fn get_server_info(&self) -> Result<String> {
@@ -45,7 +48,9 @@ impl IncusClient {
         }
 
         let body: Value = resp.json().await?;
-        if body["type"] == "sync" { return Ok(()); }
+        if body["type"] == "sync" {
+            return Ok(());
+        }
 
         let id = body["metadata"]["id"].as_str().context("No op ID")?;
         let url = format!("{}/1.0/operations/{}/wait", self.base_url, id);

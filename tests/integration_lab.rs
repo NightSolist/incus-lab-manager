@@ -11,8 +11,7 @@ mod common;
 use common::make_client;
 use incus_lab_manager::client::IncusClient;
 use incus_lab_manager::incus::{
-    InstanceSource, InstancesPost, NetworksPost, ProfilesPost,
-    StoragePoolsPost,
+    InstanceSource, InstancesPost, NetworksPost, ProfilesPost, StoragePoolsPost,
 };
 use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -28,13 +27,7 @@ fn short_prefix() -> String {
 }
 
 /// Очистка ресурсов — вызывается явно в конце или при ошибке
-async fn cleanup(
-    client: &IncusClient,
-    instance: &str,
-    profile: &str,
-    pool: &str,
-    network: &str,
-) {
+async fn cleanup(client: &IncusClient, instance: &str, profile: &str, pool: &str, network: &str) {
     println!("\n🧹 Очистка ресурсов...");
     let _ = client.stop_instance(instance).await;
     let _ = client.delete_instance(instance).await;
@@ -50,7 +43,7 @@ async fn test_full_lab_deploy_lifecycle() {
     let prefix = short_prefix();
 
     // Имена короткие, чтобы network уложился в 15 символов
-    let network_name = format!("{}-net", prefix);          // напр. t52145-net (10 симв)
+    let network_name = format!("{}-net", prefix); // напр. t52145-net (10 симв)
     let pool_name = format!("{}-pool", prefix);
     let profile_name = format!("{}-prof", prefix);
     let instance_name = format!("{}-inst", prefix);
@@ -58,7 +51,11 @@ async fn test_full_lab_deploy_lifecycle() {
     println!("\n══════════════════════════════════════════════");
     println!("🧪 Тест полного цикла деплоя лаборатории");
     println!("   Префикс ресурсов: {}", prefix);
-    println!("   network:  {} ({} симв.)", network_name, network_name.len());
+    println!(
+        "   network:  {} ({} симв.)",
+        network_name,
+        network_name.len()
+    );
     println!("══════════════════════════════════════════════\n");
 
     // Запускаем в Result чтобы корректно cleanup даже при ошибке
@@ -68,10 +65,18 @@ async fn test_full_lab_deploy_lifecycle() {
         &pool_name,
         &profile_name,
         &instance_name,
-    ).await;
+    )
+    .await;
 
     // Cleanup всегда
-    cleanup(&client, &instance_name, &profile_name, &pool_name, &network_name).await;
+    cleanup(
+        &client,
+        &instance_name,
+        &profile_name,
+        &pool_name,
+        &network_name,
+    )
+    .await;
 
     // И только потом — оценка результата
     match result {
