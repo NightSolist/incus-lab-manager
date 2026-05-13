@@ -1,0 +1,47 @@
+name: demo-lab
+description: "Полная демо-лаборатория: storage pool + сеть + профиль + 2 контейнера"
+
+# 1. Storage pool — где будут жить данные контейнеров
+storage_pools:
+  - name: demo-pool
+    driver: dir
+    description: "Demo storage pool (dir-based)"
+
+# 2. Сеть — мост для контейнеров
+networks:
+  - name: demo-net
+    ipv4: 10.50.0.1/24
+    ipv6: none
+    dns_domain: demo.local
+
+# 3. Профиль — связывает сеть и storage
+profiles:
+  - name: demo-profile
+    description: "Demo profile with network and storage"
+    network: demo-net
+    storage: demo-pool
+
+# 4. Инстансы — два Alpine-контейнера
+instances:
+  - name: demo-web
+    type: container
+    image: images:alpine/3.21
+    profiles:
+      - demo-profile
+    start: true
+
+  - name: demo-db
+    type: container
+    image: images:alpine/3.21
+    profiles:
+      - demo-profile
+    start: true
+
+
+# cargo run -- deploy --file demo-lab.yaml
+# (показать incus list)
+# incus list
+# incus network list  
+# incus storage list
+# incus profile list
+# cargo run -- destroy --file demo-lab.yaml
