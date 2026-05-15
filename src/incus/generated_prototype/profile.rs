@@ -1,8 +1,6 @@
 // Auto-generated. Do not edit.
 
 use serde::{Serialize, Deserialize};
-use crate::incus::ConfigMap;
-use crate::incus::DevicesMap;
-
+use crate::incus::ProfilePut;
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct Profile {pub name: String,pub usedby: Vec<String>,pub project: String,pub config: ConfigMap,pub description: String,pub devices: DevicesMap,}
+pub struct Profile {    #[serde(flatten)]    pub profile_put: ProfilePut,    pub name: String,    pub used_by: Vec<String>,    pub project: String,}
