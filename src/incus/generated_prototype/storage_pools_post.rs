@@ -1,7 +1,6 @@
 // Auto-generated. Do not edit.
 
 use serde::{Serialize, Deserialize};
-use crate::incus::ConfigMap;
-
+use crate::incus::StoragePoolPut;
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct StoragePoolsPost {pub name: String,pub driver: String,pub config: ConfigMap,pub description: String,}
+pub struct StoragePoolsPost {    #[serde(flatten)]    pub storage_pool_put: StoragePoolPut,    pub name: String,    pub driver: String,}
