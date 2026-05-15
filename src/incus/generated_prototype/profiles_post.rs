@@ -1,11 +1,6 @@
-use serde::{Serialize, Deserialize};
-use crate::incus::ConfigMap;
-use crate::incus::DevicesMap;
+// Auto-generated. Do not edit.
 
+use serde::{Serialize, Deserialize};
+use crate::incus::ProfilePut;
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct ProfilesPost {
-    pub name: String,
-    pub config: ConfigMap,
-    pub description: String,
-    pub devices: DevicesMap,
-}
+pub struct ProfilesPost {    #[serde(flatten)]    pub profile_put: ProfilePut,    pub name: String,}

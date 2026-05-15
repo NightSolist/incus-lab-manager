@@ -1,5 +1,7 @@
 // Auto-generated minimal DTOs
 
+pub mod config_map;
+pub mod devices_map;
 pub mod instance_put;
 pub mod instance_source;
 pub mod instance_state_put;
@@ -17,6 +19,8 @@ pub mod storage_pool;
 pub mod storage_pool_put;
 pub mod storage_pools_post;
 
+pub use config_map::ConfigMap;
+pub use devices_map::DevicesMap;
 pub use instance_put::InstancePut;
 pub use instance_source::InstanceSource;
 pub use instance_state_put::InstanceStatePut;

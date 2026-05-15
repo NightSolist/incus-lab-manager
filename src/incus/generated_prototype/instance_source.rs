@@ -2,23 +2,6 @@
 
 use serde::{Serialize, Deserialize};
 use crate::incus::ConfigMap;
-
+use crate::incus::config_map::{deserialize_config_map, deserialize_option_config_map};
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct InstanceSource {#[serde(rename = "type")]
-pub r#type: String,pub certificate: String,#[serde(skip_serializing_if = "Option::is_none")]
-pub alias: Option<String>,#[serde(skip_serializing_if = "Option::is_none")]
-pub fingerprint: Option<String>,#[serde(skip_serializing_if = "Option::is_none")]
-pub properties: Option<ConfigMap>,#[serde(skip_serializing_if = "Option::is_none")]
-pub server: Option<String>,#[serde(skip_serializing_if = "Option::is_none")]
-pub secret: Option<String>,#[serde(skip_serializing_if = "Option::is_none")]
-pub protocol: Option<String>,#[serde(skip_serializing_if = "Option::is_none")]
-pub baseimage: Option<String>,#[serde(skip_serializing_if = "Option::is_none")]
-pub mode: Option<String>,#[serde(skip_serializing_if = "Option::is_none")]
-pub operation: Option<String>,#[serde(skip_serializing_if = "Option::is_none")]
-pub websockets: Option<ConfigMap>,#[serde(skip_serializing_if = "Option::is_none")]
-pub source: Option<String>,#[serde(skip_serializing_if = "Option::is_none")]
-pub live: Option<bool>,#[serde(skip_serializing_if = "Option::is_none")]
-pub instanceonly: Option<bool>,#[serde(skip_serializing_if = "Option::is_none")]
-pub refresh: Option<bool>,#[serde(skip_serializing_if = "Option::is_none")]
-pub refreshexcludeolder: Option<bool>,#[serde(skip_serializing_if = "Option::is_none")]
-pub project: Option<String>,pub allowinconsistent: bool,}
+pub struct InstanceSource {    #[serde(rename = "type")]    pub r#type: String,    pub certificate: String,    #[serde(skip_serializing_if = "Option::is_none")]    pub alias: Option<String>,    #[serde(skip_serializing_if = "Option::is_none")]    pub fingerprint: Option<String>,    #[serde(default, deserialize_with = "deserialize_option_config_map", skip_serializing_if = "Option::is_none")]    pub properties: Option<ConfigMap>,    #[serde(skip_serializing_if = "Option::is_none")]    pub server: Option<String>,    #[serde(skip_serializing_if = "Option::is_none")]    pub secret: Option<String>,    #[serde(skip_serializing_if = "Option::is_none")]    pub protocol: Option<String>,    #[serde(rename = "base-image", skip_serializing_if = "Option::is_none")]    pub base_image: Option<String>,    #[serde(skip_serializing_if = "Option::is_none")]    pub mode: Option<String>,    #[serde(skip_serializing_if = "Option::is_none")]    pub operation: Option<String>,    #[serde(rename = "secrets", default, deserialize_with = "deserialize_option_config_map", skip_serializing_if = "Option::is_none")]    pub websockets: Option<ConfigMap>,    #[serde(skip_serializing_if = "Option::is_none")]    pub source: Option<String>,    #[serde(skip_serializing_if = "Option::is_none")]    pub live: Option<bool>,    #[serde(skip_serializing_if = "Option::is_none")]    pub instance_only: Option<bool>,    #[serde(skip_serializing_if = "Option::is_none")]    pub refresh: Option<bool>,    #[serde(skip_serializing_if = "Option::is_none")]    pub refresh_exclude_older: Option<bool>,    #[serde(skip_serializing_if = "Option::is_none")]    pub project: Option<String>,    pub allow_inconsistent: bool,}
