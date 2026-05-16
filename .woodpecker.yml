@@ -1,27 +1,50 @@
 when:
   - event: push
+  - event: pull_request
   - event: manual
 
 steps:
-
+  # ------------------------------------------------------------
+  # 1. Компиляционная проверка
+  # ------------------------------------------------------------
   - name: cargo-check
     image: rust:1.83
     commands:
       - rustc --version
       - cargo --version
-      - echo "▶ Compile-time валидация автоматически сгенерированных DTO..."
+      - echo "▶ Compile-time validation of Incus DTO..."
       - cargo check --all-targets
-      - echo "✓ cargo check passed"
+      - echo "✅ cargo check passed"
 
-  - name: cargo-fmt
+  # ------------------------------------------------------------
+  # 2. Проверка форматирования
+  # ------------------------------------------------------------
+  - name: cargo-fmt-check
     image: rust:1.83
     commands:
       - rustup component add rustfmt
-      - echo "▶ Проверка форматирования сгенерированного кода..."
-      - cargo fmt --all -- --check || echo "⚠ Форматирование требует внимания (не критично)"
-      - echo "✓ Проверка форматирования завершена"
+      - echo "▶ Checking Rust formatting..."
+      - cargo fmt --all -- --check
+      - echo "✅ cargo fmt check passed"
+    depends_on:
+      - cargo-check
 
-  - name: notify-engineer
+  # ------------------------------------------------------------
+  # 3. Unit-тесты DTO
+  # ------------------------------------------------------------
+  - name: cargo-test-serde
+    image: rust:1.83
+    commands:
+      - echo "▶ Running serde DTO unit tests..."
+      - cargo test --test serde_dto -- --nocapture
+      - echo "✅ serde DTO tests passed"
+    depends_on:
+      - cargo-fmt-check
+
+  # ------------------------------------------------------------
+  # 4. Уведомление об успехе
+  # ------------------------------------------------------------
+  - name: notify-success
     image: deblan/woodpecker-email
     settings:
       dsn:
@@ -29,37 +52,41 @@ steps:
       from:
         address:
           from_secret: email_username
-        name: Incus Sync Bot
+        name: Incus Rust CI Bot
       recipients:
         from_secret: email_recipient
       recipients_only: true
       content_type: text/plain
-      subject: "Incus Sync CI: ветка ${CI_COMMIT_BRANCH} прошла проверку"
+      subject: "✅ incus-lab-manager CI: проверка прошла (pipeline #${CI_PIPELINE_NUMBER})"
       body: |
         Здравствуйте!
 
-        Self-hosted Woodpecker CI/CD завершил проверку
-        автоматически сгенерированных Rust DTO-моделей Incus.
+        CI pipeline для incus-lab-manager успешно завершён.
+
+        Что было выполнено:
+          • cargo check --all-targets
+          • cargo fmt --all -- --check
+          • cargo test --test serde_dto -- --nocapture
 
         Сводка:
-          • Репозиторий:   ${CI_REPO}
-          • Branch:        ${CI_COMMIT_BRANCH}
-          • Commit:        ${CI_COMMIT_SHA}
-          • Pipeline:      ${CI_PIPELINE_URL}
+          • Репозиторий: ${CI_REPO}
+          • Ветка: ${CI_COMMIT_BRANCH}
+          • Коммит: ${CI_COMMIT_SHA}
+          • Pipeline: ${CI_PIPELINE_URL}
 
-        Этапы проверки:
-          ✓ cargo check (compile-time validation)
-          ✓ cargo fmt (форматирование)
-          ✓ Email-уведомление инженеру
-
-        Pull Request готов к review и merge.
+        Integration-тесты с реальным Incus в CI не запускаются.
+        Они выполняются локально вручную.
 
         —
-        Incus Sync CI Bot
-        Self-hosted Woodpecker CI/CD
+        Incus Rust CI Bot
     when:
       - status: success
+    depends_on:
+      - cargo-test-serde
 
+  # ------------------------------------------------------------
+  # 5. Уведомление об ошибке
+  # ------------------------------------------------------------
   - name: notify-failure
     image: deblan/woodpecker-email
     settings:
@@ -68,22 +95,31 @@ steps:
       from:
         address:
           from_secret: email_username
-        name: Incus Sync Bot
+        name: Incus Rust CI Bot
       recipients:
         from_secret: email_recipient
       recipients_only: true
       content_type: text/plain
-      subject: "⚠ Incus Sync CI: ветка ${CI_COMMIT_BRANCH} требует внимания"
+      subject: "⚠️ incus-lab-manager CI: ошибка проверки (pipeline #${CI_PIPELINE_NUMBER})"
       body: |
         Здравствуйте!
 
-        Self-hosted Woodpecker CI/CD обнаружил проблемы в
-        автоматически сгенерированных Rust DTO-моделях Incus.
+        CI pipeline для incus-lab-manager завершился с ошибкой.
+
+        Возможные этапы отказа:
+          • cargo check
+          • cargo fmt --check
+          • cargo test --test serde_dto
 
         Сводка:
-          • Branch:        ${CI_COMMIT_BRANCH}
-          • Pipeline:      ${CI_PIPELINE_URL}
+          • Репозиторий: ${CI_REPO}
+          • Ветка: ${CI_COMMIT_BRANCH}
+          • Коммит: ${CI_COMMIT_SHA}
+          • Pipeline: ${CI_PIPELINE_URL}
 
-        Требуется ручное вмешательство.
+        Требуется анализ логов pipeline.
+
+        —
+        Incus Rust CI Bot
     when:
       - status: failure
