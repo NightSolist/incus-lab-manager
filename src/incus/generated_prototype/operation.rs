@@ -1,10 +1,9 @@
-// Auto-generated. Do not edit.
-
 use crate::incus::StatusCode;
 use chrono;
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::collections::HashMap;
+
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Operation {
     pub id: String,
@@ -19,4 +18,6 @@ pub struct Operation {
     pub may_cancel: bool,
     pub err: String,
     pub location: String,
+    #[serde(rename = "test_llm_field")]
+    pub test_llm_field: String,
 }
