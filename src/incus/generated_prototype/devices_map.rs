@@ -9,15 +9,11 @@ use std::collections::HashMap;
 /// приводятся к строке.
 pub type DevicesMap = HashMap<String, HashMap<String, String>>;
 
-pub fn deserialize_devices_map<'de, D>(
-    deserializer: D,
-) -> Result<DevicesMap, D::Error>
+pub fn deserialize_devices_map<'de, D>(deserializer: D) -> Result<DevicesMap, D::Error>
 where
     D: Deserializer<'de>,
 {
-    let raw = HashMap::<String, HashMap<String, Value>>::deserialize(
-        deserializer,
-    )?;
+    let raw = HashMap::<String, HashMap<String, Value>>::deserialize(deserializer)?;
     let mut outer = HashMap::new();
 
     for (device_name, device_cfg) in raw {
@@ -50,9 +46,7 @@ pub fn deserialize_option_devices_map<'de, D>(
 where
     D: Deserializer<'de>,
 {
-    let opt = Option::<HashMap<String, HashMap<String, Value>>>::deserialize(
-        deserializer,
-    )?;
+    let opt = Option::<HashMap<String, HashMap<String, Value>>>::deserialize(deserializer)?;
 
     match opt {
         None => Ok(None),
@@ -67,13 +61,11 @@ where
                         Value::Number(n) => n.to_string(),
                         Value::Null => String::new(),
                         _ => {
-                            return Err(serde::de::Error::custom(
-                                format!(
-                                    "unsupported value type for key '{}' \
+                            return Err(serde::de::Error::custom(format!(
+                                "unsupported value type for key '{}' \
                                      in device '{}'",
-                                    key, device_name
-                                ),
-                            ))
+                                key, device_name
+                            )))
                         }
                     };
                     inner.insert(key, string_value);

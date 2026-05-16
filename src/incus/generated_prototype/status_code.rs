@@ -1,10 +1,12 @@
 // Auto-generated. Do not edit.
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
-#[repr(i32)]pub enum StatusCode {
-    #[default]    OperationCreated = 100,
+#[repr(i32)]
+pub enum StatusCode {
+    #[default]
+    OperationCreated = 100,
     Started = 101,
     Stopped = 102,
     Running = 103,
