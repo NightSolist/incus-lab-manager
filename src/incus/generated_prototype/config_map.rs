@@ -9,9 +9,7 @@ use std::collections::HashMap;
 /// воспроизводя поведение UnmarshalJSON из Go-реализации.
 pub type ConfigMap = HashMap<String, String>;
 
-pub fn deserialize_config_map<'de, D>(
-    deserializer: D,
-) -> Result<ConfigMap, D::Error>
+pub fn deserialize_config_map<'de, D>(deserializer: D) -> Result<ConfigMap, D::Error>
 where
     D: Deserializer<'de>,
 {
@@ -37,15 +35,11 @@ where
     Ok(result)
 }
 
-pub fn deserialize_option_config_map<'de, D>(
-    deserializer: D,
-) -> Result<Option<ConfigMap>, D::Error>
+pub fn deserialize_option_config_map<'de, D>(deserializer: D) -> Result<Option<ConfigMap>, D::Error>
 where
     D: Deserializer<'de>,
 {
-    let opt = Option::<HashMap<String, Value>>::deserialize(
-        deserializer,
-    )?;
+    let opt = Option::<HashMap<String, Value>>::deserialize(deserializer)?;
 
     match opt {
         None => Ok(None),
@@ -58,13 +52,11 @@ where
                     Value::Number(n) => n.to_string(),
                     Value::Null => String::new(),
                     _ => {
-                        return Err(serde::de::Error::custom(
-                            format!(
-                                "unsupported value type for key '{}' \
+                        return Err(serde::de::Error::custom(format!(
+                            "unsupported value type for key '{}' \
                                  in ConfigMap",
-                                key
-                            ),
-                        ))
+                            key
+                        )))
                     }
                 };
                 result.insert(key, string_value);
