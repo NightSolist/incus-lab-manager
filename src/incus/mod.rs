@@ -1,7 +1,6 @@
-pub mod custom;
+// src/incus/mod.rs
 
-#[allow(unused_imports, dead_code)]
 pub mod generated_prototype;
 
-pub use custom::{ConfigMap, DevicesMap};
+// Реэкспортируем всё из generated_prototype
 pub use generated_prototype::*;
