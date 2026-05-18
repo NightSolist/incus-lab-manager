@@ -14,3 +14,7 @@ certs/*.pfx
 *.code-workspace
 .idea/
 .DS_Store
+*_old.rs
+*_old.j2
+*_old.py
+*_old.yml
