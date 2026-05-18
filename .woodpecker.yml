@@ -45,40 +45,82 @@ steps:
   # 4. Уведомление об успехе
   # ------------------------------------------------------------
   - name: notify-success
-    image: deblan/woodpecker-email
-    settings:
-      dsn:
-        from_secret: email_dsn
-      from:
-        address:
-          from_secret: email_username
-        name: Incus Rust CI Bot
-      recipients:
+    image: python:3.12-slim
+    environment:
+      SMTP_HOST:
+        from_secret: smtp_host
+      SMTP_PORT:
+        from_secret: smtp_port
+      SMTP_USER:
+        from_secret: email_username
+      SMTP_PASS:
+        from_secret: smtp_pass
+      NOTIFY_EMAIL:
         from_secret: email_recipient
-      recipients_only: true
-      content_type: text/plain
-      subject: "✅ incus-lab-manager CI: проверка прошла (pipeline #${CI_PIPELINE_NUMBER})"
-      body: |
-        Здравствуйте!
+      NOTIFY_FROM: "Incus Rust CI Bot"
+    commands:
+      - |
+        python -c "
+        import os, smtplib, ssl
+        from email.message import EmailMessage
 
-        CI pipeline для incus-lab-manager успешно завершён.
+        pipeline_number = os.environ.get('CI_PIPELINE_NUMBER', '?')
+        pipeline_url    = os.environ.get('CI_PIPELINE_URL', '')
+        repo            = os.environ.get('CI_REPO', '')
+        commit_sha      = os.environ.get('CI_COMMIT_SHA', '')
+        branch          = os.environ.get('CI_COMMIT_BRANCH', '')
+        event           = os.environ.get('CI_PIPELINE_EVENT', '')
 
-        Что было выполнено:
-          • cargo check --all-targets
-          • cargo fmt --all -- --check
-          • cargo test --test serde_dto -- --nocapture
+        smtp_host    = os.environ['SMTP_HOST']
+        smtp_port    = int(os.environ['SMTP_PORT'])
+        smtp_user    = os.environ['SMTP_USER']
+        smtp_pass    = os.environ['SMTP_PASS']
+        notify_email = os.environ['NOTIFY_EMAIL']
+        from_name    = os.environ.get('NOTIFY_FROM', 'Incus Rust CI Bot')
 
-        Сводка:
-          • Репозиторий: ${CI_REPO}
-          • Ветка: ${CI_COMMIT_BRANCH}
-          • Коммит: ${CI_COMMIT_SHA}
-          • Pipeline: ${CI_PIPELINE_URL}
+        subject = (
+            f'incus-lab-manager CI: проверка пройдена '
+            f'(pipeline #{pipeline_number})'
+        )
 
-        Integration-тесты с реальным Incus в CI не запускаются.
-        Они выполняются локально вручную.
+        body = (
+            'Здравствуйте!\n\n'
+            'CI pipeline для incus-lab-manager успешно завершён.\n\n'
+            'Выполненные проверки:\n'
+            '  - cargo check --all-targets\n'
+            '  - cargo fmt --all -- --check\n'
+            '  - cargo test --test serde_dto\n\n'
+            'Сводка:\n'
+            f'  - Репозиторий: {repo}\n'
+            f'  - Ветка: {branch}\n'
+            f'  - Коммит: {commit_sha}\n'
+            f'  - Событие: {event}\n'
+            f'  - Pipeline: {pipeline_url}\n\n'
+            'Integration-тесты с реальным Incus в CI не запускаются.\n'
+            'Они выполняются локально вручную.\n\n'
+            '--\n'
+            'Incus Rust CI Bot\n'
+        )
 
-        —
-        Incus Rust CI Bot
+        msg = EmailMessage()
+        msg['Subject'] = subject
+        msg['From'] = f'{from_name} <{smtp_user}>'
+        msg['To'] = notify_email
+        msg.set_content(body)
+
+        ctx = ssl.create_default_context()
+        if smtp_port == 465:
+            with smtplib.SMTP_SSL(smtp_host, smtp_port, context=ctx) as s:
+                s.login(smtp_user, smtp_pass)
+                s.send_message(msg)
+        else:
+            with smtplib.SMTP(smtp_host, smtp_port) as s:
+                s.starttls(context=ctx)
+                s.login(smtp_user, smtp_pass)
+                s.send_message(msg)
+
+        print(f'Success email sent to {notify_email}')
+        "
     when:
       - status: success
     depends_on:
@@ -88,38 +130,86 @@ steps:
   # 5. Уведомление об ошибке
   # ------------------------------------------------------------
   - name: notify-failure
-    image: deblan/woodpecker-email
-    settings:
-      dsn:
-        from_secret: email_dsn
-      from:
-        address:
-          from_secret: email_username
-        name: Incus Rust CI Bot
-      recipients:
+    image: python:3.12-slim
+    environment:
+      SMTP_HOST:
+        from_secret: smtp_host
+      SMTP_PORT:
+        from_secret: smtp_port
+      SMTP_USER:
+        from_secret: email_username
+      SMTP_PASS:
+        from_secret: smtp_pass
+      NOTIFY_EMAIL:
         from_secret: email_recipient
-      recipients_only: true
-      content_type: text/plain
-      subject: "⚠️ incus-lab-manager CI: ошибка проверки (pipeline #${CI_PIPELINE_NUMBER})"
-      body: |
-        Здравствуйте!
+      NOTIFY_FROM: "Incus Rust CI Bot"
+    commands:
+      - |
+        python -c "
+        import os, smtplib, ssl
+        from email.message import EmailMessage
 
-        CI pipeline для incus-lab-manager завершился с ошибкой.
+        pipeline_number = os.environ.get('CI_PIPELINE_NUMBER', '?')
+        pipeline_url    = os.environ.get('CI_PIPELINE_URL', '')
+        repo            = os.environ.get('CI_REPO', '')
+        commit_sha      = os.environ.get('CI_COMMIT_SHA', '')
+        branch          = os.environ.get('CI_COMMIT_BRANCH', '')
+        event           = os.environ.get('CI_PIPELINE_EVENT', '')
 
-        Возможные этапы отказа:
-          • cargo check
-          • cargo fmt --check
-          • cargo test --test serde_dto
+        smtp_host    = os.environ['SMTP_HOST']
+        smtp_port    = int(os.environ['SMTP_PORT'])
+        smtp_user    = os.environ['SMTP_USER']
+        smtp_pass    = os.environ['SMTP_PASS']
+        notify_email = os.environ['NOTIFY_EMAIL']
+        from_name    = os.environ.get('NOTIFY_FROM', 'Incus Rust CI Bot')
 
-        Сводка:
-          • Репозиторий: ${CI_REPO}
-          • Ветка: ${CI_COMMIT_BRANCH}
-          • Коммит: ${CI_COMMIT_SHA}
-          • Pipeline: ${CI_PIPELINE_URL}
+        subject = (
+            f'incus-lab-manager CI: проверка не пройдена '
+            f'(pipeline #{pipeline_number})'
+        )
 
-        Требуется анализ логов pipeline.
+        body = (
+            'Здравствуйте!\n\n'
+            'CI pipeline для incus-lab-manager завершился с ошибкой.\n\n'
+            'Возможные этапы отказа:\n'
+            '  - cargo check --all-targets\n'
+            '  - cargo fmt --all -- --check\n'
+            '  - cargo test --test serde_dto\n\n'
+            'Сводка:\n'
+            f'  - Репозиторий: {repo}\n'
+            f'  - Ветка: {branch}\n'
+            f'  - Коммит: {commit_sha}\n'
+            f'  - Событие: {event}\n'
+            f'  - Pipeline: {pipeline_url}\n\n'
+            'Это означает, что недавно сгенерированные Rust DTO\n'
+            'или код проекта incus-lab-manager стали несовместимы.\n'
+            'Требуется анализ логов pipeline.\n\n'
+            '--\n'
+            'Incus Rust CI Bot\n'
+        )
 
-        —
-        Incus Rust CI Bot
+        msg = EmailMessage()
+        msg['Subject'] = subject
+        msg['From'] = f'{from_name} <{smtp_user}>'
+        msg['To'] = notify_email
+        msg.set_content(body)
+
+        ctx = ssl.create_default_context()
+        if smtp_port == 465:
+            with smtplib.SMTP_SSL(smtp_host, smtp_port, context=ctx) as s:
+                s.login(smtp_user, smtp_pass)
+                s.send_message(msg)
+        else:
+            with smtplib.SMTP(smtp_host, smtp_port) as s:
+                s.starttls(context=ctx)
+                s.login(smtp_user, smtp_pass)
+                s.send_message(msg)
+
+        print(f'Failure email sent to {notify_email}')
+        "
     when:
       - status: failure
+    depends_on:
+      - cargo-check
+      - cargo-fmt-check
+      - cargo-test-serde
