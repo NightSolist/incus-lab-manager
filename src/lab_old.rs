@@ -6,8 +6,7 @@ use crate::config::{InstanceConfig, Lab, NetworkConfig, ProfileConfig, StoragePo
 use crate::remotes;
 
 use crate::incus::{
-    ConfigMap, DevicesMap, InstancePut, InstanceSource, InstanceType, InstancesPost, NetworkPut,
-    NetworksPost, ProfilePut, ProfilesPost, StoragePoolPut, StoragePoolsPost,
+    InstanceSource, InstanceType, InstancesPost, NetworksPost, ProfilesPost, StoragePoolsPost,
 };
 
 pub struct Deployer<'a> {
@@ -78,22 +77,19 @@ impl<'a> Deployer<'a> {
     async fn deploy_storage_pool(&self, config: &StoragePoolConfig) -> Result<()> {
         println!("💾 Deploying storage pool '{}'", config.name);
 
+        // На случай если уже существует
         let _ = self.client.delete_storage_pool(&config.name).await;
 
-        let mut pool_config: ConfigMap = HashMap::new();
+        let mut pool_config = HashMap::new();
         if let Some(src) = &config.source {
             pool_config.insert("source".to_string(), src.clone());
         }
 
         let req = StoragePoolsPost {
-            storage_pool_put: StoragePoolPut {
-                config: pool_config,
-                description: config.description.clone().unwrap_or_default(),
-                ..Default::default()
-            },
             name: config.name.clone(),
             driver: config.driver.clone(),
-            ..Default::default()
+            config: pool_config,
+            description: config.description.clone().unwrap_or_else(|| String::new()),
         };
 
         self.client.create_storage_pool(&req).await?;
@@ -106,8 +102,7 @@ impl<'a> Deployer<'a> {
 
         let _ = self.client.delete_network(&config.name).await;
 
-        let mut net_config: ConfigMap = HashMap::new();
-
+        let mut net_config = HashMap::new();
         if let Some(ipv4) = &config.ipv4 {
             net_config.insert("ipv4.address".to_string(), ipv4.clone());
             net_config.insert("ipv4.nat".to_string(), "true".to_string());
@@ -129,13 +124,9 @@ impl<'a> Deployer<'a> {
         }
 
         let req = NetworksPost {
-            network_put: NetworkPut {
-                config: net_config,
-                description: String::new(),
-                ..Default::default()
-            },
             name: config.name.clone(),
             r#type: "bridge".to_string(),
+            config: net_config,
             ..Default::default()
         };
 
@@ -149,8 +140,9 @@ impl<'a> Deployer<'a> {
 
         let _ = self.client.delete_profile(&config.name).await;
 
-        let mut devices: DevicesMap = HashMap::new();
+        let mut devices = HashMap::new();
 
+        // eth0 — если указан network
         if let Some(net_name) = &config.network {
             let mut eth0 = HashMap::new();
             eth0.insert("type".to_string(), "nic".to_string());
@@ -160,6 +152,7 @@ impl<'a> Deployer<'a> {
             devices.insert("eth0".to_string(), eth0);
         }
 
+        // root — если указан storage
         if let Some(pool_name) = &config.storage {
             let mut root = HashMap::new();
             root.insert("type".to_string(), "disk".to_string());
@@ -168,17 +161,11 @@ impl<'a> Deployer<'a> {
             devices.insert("root".to_string(), root);
         }
 
-        let profile_config: ConfigMap = config.config.clone().into_iter().collect();
-
         let req = ProfilesPost {
-            profile_put: ProfilePut {
-                config: profile_config,
-                description: config.description.clone().unwrap_or_default(),
-                devices,
-                ..Default::default()
-            },
             name: config.name.clone(),
-            ..Default::default()
+            config: config.config.clone().into_iter().collect(),
+            description: config.description.clone().unwrap_or_else(|| String::new()),
+            devices,
         };
 
         self.client.create_profile(&req).await?;
@@ -188,44 +175,29 @@ impl<'a> Deployer<'a> {
 
     async fn deploy_instance(&self, config: &InstanceConfig) -> Result<()> {
         println!("📦 Deploying {} ({})", config.name, config.type_);
-
         let _ = self.client.delete_instance(&config.name).await;
 
         let (server, protocol, alias) = remotes::parse_image(&config.image);
-
         let type_enum = if config.type_ == "virtual-machine" {
             InstanceType::InstanceTypeVM
         } else {
             InstanceType::InstanceTypeContainer
         };
 
-        let mut devices: DevicesMap = HashMap::new();
+        let mut devices = HashMap::new();
         if let Some(net_name) = &config.network {
             let mut eth0 = HashMap::new();
             eth0.insert("type".to_string(), "nic".to_string());
             eth0.insert("nictype".to_string(), "bridged".to_string());
             eth0.insert("parent".to_string(), net_name.clone());
             eth0.insert("name".to_string(), "eth0".to_string());
+
             devices.insert("eth0".to_string(), eth0);
         }
 
-        let instance_config: ConfigMap = config.config.clone().into_iter().collect();
-
         let req = InstancesPost {
-            instance_put: InstancePut {
-                architecture: String::new(),
-                config: instance_config,
-                devices,
-                ephemeral: false,
-                profiles: if config.profiles.is_empty() {
-                    vec!["default".to_string()]
-                } else {
-                    config.profiles.clone()
-                },
-                description: String::new(),
-                ..Default::default()
-            },
             name: config.name.clone(),
+            r#type: type_enum,
             source: InstanceSource {
                 r#type: "image".to_string(),
                 mode: Some("pull".to_string()),
@@ -234,8 +206,13 @@ impl<'a> Deployer<'a> {
                 alias: Some(alias),
                 ..Default::default()
             },
-            instance_type: String::new(),
-            r#type: type_enum,
+            profiles: if config.profiles.is_empty() {
+                vec!["default".to_string()]
+            } else {
+                config.profiles.clone()
+            },
+            devices,
+            config: config.config.clone().into_iter().collect(),
             start: config.start,
             ..Default::default()
         };
